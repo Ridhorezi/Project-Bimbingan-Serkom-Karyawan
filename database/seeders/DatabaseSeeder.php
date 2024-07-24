@@ -20,11 +20,14 @@ class DatabaseSeeder extends Seeder
         //     'email' => 'test@example.com',
         // ]);
 
-       \App\Models\User::create([
+        \App\Models\User::create([
             'name' => 'Admin',
             'email' => 'admin@gmail.com',
             'password' => Hash::make('password'),
             'role' => 'admin', // Set role sebagai 'admin'
         ]);
+
+        // Panggil seeder Karyawan
+        $this->call(KaryawanSeeder::class);
     }
 }

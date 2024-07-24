@@ -3,13 +3,22 @@
 namespace App\Http\Controllers;
 
 use App\Models\Karyawan;
+use App\Procedures\KaryawanProcedures;
+use App\Functions\KaryawanFunctions;
 use Illuminate\Http\Request;
-
 
 // Membaca Logika Pemrograman Mengacu pada Kinerja Statement Akses (Operasi CRUD)
 
 class KaryawanController extends Controller
 {
+    protected $procedures;
+    protected $functions;
+
+    public function __construct()
+    {
+        $this->procedures = new KaryawanProcedures();
+        $this->functions = new KaryawanFunctions();
+    }
 
     // Menentukan metode yang sesuai
     public function index(Request $request)
@@ -18,14 +27,6 @@ class KaryawanController extends Controller
 
         // Contoh field yang sesuai (Melakukan perbaikan).
         $sortField = $request->query('sortField', 'nama'); // Default sorting field
-
-        // Contoh field yang salah guna simulasi debugging
-        // $sortField = $request->query('sortField', 'invalid_column'); // Kolom sorting yang tidak valid
-
-        // Menggunakan var_dump untuk debugging
-
-        // var_dump($sortField);
-        // exit;
 
         $sortOrder = $request->query('sortOrder', 'asc'); // Default sorting order
 
@@ -48,6 +49,9 @@ class KaryawanController extends Controller
         //         }
         //     });
         // }
+
+        // Menggunakan prosedur untuk mendapatkan semua karyawan
+        $karyawans = $this->procedures->getAllKaryawans();
 
         // Algoritma sorting pada query
         $karyawans = $query->orderBy($sortField, $sortOrder)->paginate(10);
@@ -83,7 +87,7 @@ class KaryawanController extends Controller
         }
 
         // Menyimpan Data ke Database (Menerapkan Akses Basis Data di Laravel)
-        Karyawan::create($data);
+        $this->procedures->addKaryawan($data);
 
         return redirect()->route('karyawans.index')->with('success', 'Karyawan created successfully.');
     }
@@ -119,7 +123,7 @@ class KaryawanController extends Controller
         }
 
         // Mengupdate Data ke Database (Menerapkan Akses Basis Data di Laravel)
-        $karyawan->update($data);
+        $this->procedures->updateKaryawan($karyawan, $data);
 
         return redirect()->route('karyawans.index')->with('success', 'Karyawan updated successfully.');
     }
@@ -128,7 +132,7 @@ class KaryawanController extends Controller
     public function destroy(Karyawan $karyawan)
     {
         // Menjelaskan variable sesuai kaidah pemrograman
-        $karyawan->delete();
+        $this->procedures->deleteKaryawan($karyawan);
 
         return redirect()->route('karyawans.index')->with('success', 'Karyawan deleted successfully.');
     }
